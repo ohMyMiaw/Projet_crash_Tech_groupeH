@@ -2,8 +2,7 @@
 #include "age_data.h"
 #include "main.h"
 
-void age_data(){
+void age_data(char *fichier){
 
-    
     return;
 }
