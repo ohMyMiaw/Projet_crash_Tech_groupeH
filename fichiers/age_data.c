@@ -6,3 +6,4 @@ void age_data(char *fichier){
 
     return;
 }
+
