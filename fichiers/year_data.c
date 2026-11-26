@@ -5,6 +5,9 @@
 #include "main.h"
 #include "constante.h"
 
+
+static YearStats years[NB_YEARS];
+
 void year_data(char *fichier){
     char annee[8];
     printf(ANSI_BOLD ANSI_BRIGHT_RED);
@@ -26,7 +29,39 @@ void year_data(char *fichier){
     }
 }
 
-void afficher_data_annee(int annee){
+static void afficher_data_annee(int annee){
+    int idx = annee - YEAR_MIN;
+    YearStats *s = &years[idx];
 
-    return;
+    printf(ANSI_BOLD ANSI_BRIGHT_CYAN);
+    printf("\n  --- Annee %d ---\n", annee);
+    printf(ANSI_RESET);
+
+    if (s->accident_count == 0) {
+        printf("  Aucune donnee pour cette annee dans ce fichier.\n");
+        return;
+    }
+
+    printf("  Nombre d'accidents       : %d\n", s->accident_count);
+    printf("  Usagers indemnes         : %d\n", s->uninjured_count);
+    printf(ANSI_BRIGHT_RED "  Usagers tues             : %d\n" ANSI_RESET, s->fatality_count);
+    printf("  Blesses graves           : %d\n", s->serious_injury_count);
+    printf("  Blesses legers           : %d\n", s->minor_injury_count);
+}
+
+static void charger_year_data(const char *fichier){
+    FILE *f = fopen(fichier, "r");
+
+    if (f == NULL) {
+        fprintf(stderr, "Erreur : impossible d'ouvrir le fichier \"%s\".\n", fichier);
+        return;
+    }
+
+    char ligne[MAX_LINE_LENGTH];
+
+    while (fgets(ligne, sizeof(ligne), f) != NULL) {
+        traiter_ligne(ligne);
+    }
+
+    fclose(f);
 }
