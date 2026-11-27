@@ -183,7 +183,15 @@ AgeNode *age_process_line(AgeNode *head, char *line, int line_number){
 
     /* Data unusable for the chart: the line is ignored */
     if (birth_result != FIELD_OK || user_type < 1 || user_type > NB_USER_TYPES) {
+<<<<<<< HEAD
         return head;
+=======
+        return;
+    }
+    int age = year - birth_year;
+    if (age < 0 || age > AGE_MAX) { // change ça alex stp jsp pourquoi ya ca
+        return;
+>>>>>>> e55cb33dac2e2ff3ce9c4f28bda94040b1e0ff76
     }
 
     /* Impossible age: ignored. This also protects the unsigned char

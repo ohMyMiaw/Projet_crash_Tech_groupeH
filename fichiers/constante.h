@@ -12,6 +12,7 @@
 
 #define VEHICLE_ID_LEN 15
 
+#define AGE_MAX 120
 #define NB_CSV_FIELDS 9
 
 // Définition des indices des champs dans le fichier CSV
