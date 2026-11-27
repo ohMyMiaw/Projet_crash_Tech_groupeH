@@ -135,7 +135,7 @@ void age_process_line(AgeNode **head, char *line, long line_number){
         return;
     }
     int age = year - birth_year;
-    if (age < 0 || age > AGE_MAX) {
+    if (age < 0 || age > AGE_MAX) { // change ça alex stp jsp pourquoi ya ca
         return;
     }
 
