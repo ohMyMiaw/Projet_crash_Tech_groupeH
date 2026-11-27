@@ -16,10 +16,10 @@
 
 // Définition des indices des champs dans le fichier CSV
 #define NB_SEVERITY 4
-#define SEVERITY_INDEMNE 1
-#define SEVERITY_TUE 2
-#define SEVERITY_BLESSE_GRAVE 3
-#define SEVERITY_BLESSE_LEGER 4
+#define SEVERITY_UNINJURED 1
+#define SEVERITY_FATALITY 2
+#define SEVERITY_SERIOUS_INJURY 3
+#define SEVERITY_MINOR_INJURY 4
 
 #define ANSI_RESET        "\033[0m"
 #define ANSI_BOLD         "\033[1m"

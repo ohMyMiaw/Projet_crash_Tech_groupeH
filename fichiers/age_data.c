@@ -3,7 +3,7 @@
 #include "age_data.h"
 #include "main.h"
 
-static int lire_champ_entier(const char *champ){
+static int readEnt(const char *champ){
     if (champ[0] == '\0') {
         return AGE_INCONNU;
     }
@@ -56,9 +56,8 @@ static AgeNode *trouver_ou_creer_noeud(AgeNode **tete, int age){
 }
 
 void age_data(char *fichier){
-    /* TODO : utiliser lire_champ_entier et trouver_ou_creer_noeud */
     (void)fichier;
-    (void)lire_champ_entier;
+    (void)readEnt;
     (void)trouver_ou_creer_noeud;
     return;
 }

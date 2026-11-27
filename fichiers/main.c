@@ -12,7 +12,9 @@ int main(int argc, char *argv[])
     }
 
     char *mode    = argv[1];
-    char *fichier = argv[2];
+    char fichier[100];
+    strcpy(fichier,"dossier_csv/");
+    strcat(fichier,argv[2]);
 
     if (strcmp(mode, "YEAR_DATA") == 0) {
         year_data(fichier);
