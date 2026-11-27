@@ -1,6 +1,6 @@
 #ifndef main_h
 #define main_h
 
-int main(char *fichier);
+/* main() n'a pas besoin d'être déclarée */
 
 #endif

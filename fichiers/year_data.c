@@ -8,8 +8,13 @@
 
 static YearStats years[NB_YEARS];
 
+static void afficher_data_annee(int annee);
+static void charger_year_data(const char *fichier);
+static void traiter_ligne(const char *ligne);
+
 void year_data(char *fichier){
     char annee[8];
+    charger_year_data(fichier);
     printf(ANSI_BOLD ANSI_BRIGHT_RED);
     printf("  +===========================================+\n");
     printf("  |                                           |\n");
@@ -19,12 +24,14 @@ void year_data(char *fichier){
     printf("  |             X pour quitter                |\n");
     printf("  +===========================================+\n");
     printf(ANSI_RESET);
-    scanf("%s",annee);
-    if (strcmp(annee, "x") == 0){
+    if (scanf("%7s", annee) != 1) {
+        return;
+    }
+    if (strcmp(annee, "x") == 0 || strcmp(annee, "X") == 0){
         return;
     }
     int value = (int)strtol(annee, NULL, 10);
-    if (value > YEAR_MIN && value < YEAR_MAX){
+    if (value >= YEAR_MIN && value <= YEAR_MAX){
         afficher_data_annee(value);
     }
 }
@@ -64,4 +71,9 @@ static void charger_year_data(const char *fichier){
     }
 
     fclose(f);
+}
+
+static void traiter_ligne(const char *ligne){
+    /* TODO : découper la ligne CSV (NB_CSV_FIELDS champs) et remplir years[] */
+    (void)ligne;
 }

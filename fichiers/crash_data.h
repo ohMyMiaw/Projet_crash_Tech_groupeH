@@ -3,8 +3,6 @@
 
 void crash_data(char *fichier);
 
-#endif
-
 //STUCTURE CRASH DATA : rechercher rapidement un accident par année et ID,
 //puis afficher les véhicules et leurs victimes
 
@@ -41,3 +39,4 @@ typedef struct CrashNode {
     struct CrashNode *right;
 } CrashNode;
 
+#endif
