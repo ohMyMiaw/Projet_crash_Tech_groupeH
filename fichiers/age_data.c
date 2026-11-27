@@ -5,20 +5,20 @@
 #include "main.h"
 #include "constante.h"
 
-#define INPUT_LEN 16                  /* size of the menu input buffer */
+#define INPUT_LEN 16                  /* taille du tampon de saisie du menu */
 
-/* Chart geometry */
-#define MAX_BINS (AGE_MAX / 2 + 1)    /* the smallest bin size is 2 years */
-#define CHART_HEIGHT 20               /* number of text rows of the plot area */
-#define CHART_MAX_WIDTH 75            /* target width of the plot area (chars) */
-#define LABEL_ROWS 5                  /* a y-axis label every 5 rows */
+/* Dimensions du graphique */
+#define MAX_BINS (AGE_MAX / 2 + 1)    /* la plus petite tranche couvre 2 ans */
+#define CHART_HEIGHT 20               /* nombre de lignes de texte de la zone du graphique */
+#define CHART_MAX_WIDTH 75            /* largeur cible de la zone du graphique (caractères) */
+#define LABEL_ROWS 5                  /* une graduation de l’axe Y toutes les 5 lignes */
 #define NB_NICE_STEPS 13
 
-/* Age bins (in years) selectable from the menu */
+/* Tranches d’âge (en années) sélectionnables dans le menu */
 #define NB_BIN_SIZES 3
-#define DEFAULT_BIN_INDEX 1           /* 5 years */
+#define DEFAULT_BIN_INDEX 1           /* 5 ans */
 
-/* Result of reading an integer field */
+/* Résultat de la lecture d’un champ entier */
 #define FIELD_OK      0
 #define FIELD_EMPTY   1
 #define FIELD_INVALID 2
@@ -26,21 +26,21 @@
 char *AGE_TYPE_NAMES[NB_USER_TYPES]  = {"Conducteur", "Passager", "Pieton"};
 char *AGE_GENDER_NAMES[NB_GENDERS]   = {"Homme", "Femme", "Non releve"};
 
-/* Background colors: a bar is drawn with colored spaces (pure ASCII) */
+/* Couleurs de fond : une barre est dessinée avec des espaces colorés (ASCII uniquement) */
 char *AGE_TYPE_COLORS[NB_USER_TYPES]  = {ANSI_BG_GREEN, ANSI_BG_YELLOW, ANSI_BG_RED};
 char *AGE_GENDER_COLORS[NB_GENDERS]   = {ANSI_BG_BLUE, ANSI_BG_MAGENTA, ANSI_BG_WHITE};
 
 int   AGE_BIN_SIZES[NB_BIN_SIZES]    = {2, 5, 10};
 char *AGE_BIN_NAMES[NB_BIN_SIZES]    = {"2 ans", "5 ans", "10 ans"};
 
-/* Candidate values for a quarter of the y axis (in %) */
+/* Valeurs possibles pour un quart de l’axe Y (en %) */
 double AGE_NICE_STEPS[NB_NICE_STEPS] = {0.1, 0.2, 0.25, 0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 10, 25};
 
 /* ------------------------------------------------------------------ */
-/*  Reading and storing the data                                      */
+/*  Lecture et stockage des données                                      */
 /* ------------------------------------------------------------------ */
 
-/* Reads an integer from a text field. */
+/* Lit un entier depuis un champ de texte. */
 int age_read_int_field(char *field, int *value){
     int i = 0;
     int sign = 1;
@@ -73,8 +73,8 @@ int age_read_int_field(char *field, int *value){
     return FIELD_OK;
 }
 
-/* Looks for the node of an age in the list (sorted by decreasing age),
-   creates it at the right place if it does not exist. */
+/* Recherche le nœud correspondant à un âge dans la liste (triée par âge décroissant),
+   et le crée à la bonne place s’il n’existe pas. */
 AgeNode *age_find_or_create_node(AgeNode *head, int age){
     AgeNode *previous = NULL;
     AgeNode *current = head;
@@ -112,7 +112,7 @@ AgeNode *age_find_or_create_node(AgeNode *head, int age){
     return head;
 }
 
-/* Frees the whole list. */
+/* Libère toute la liste. */
 void age_free_list(AgeNode *head){
     while (head != NULL) {
         AgeNode *next = head->next;
@@ -121,7 +121,7 @@ void age_free_list(AgeNode *head){
     }
 }
 
-/* Prints an error message (with the line number if known) and exits. */
+/* Affiche un message d’erreur (avec le numéro de ligne si connu), puis quitte. */
 void age_fatal_error(char *message, int line_number){
     if (line_number > 0) {
         fprintf(stderr, "Erreur (ligne %d) : %s\n", line_number, message);
@@ -131,7 +131,7 @@ void age_fatal_error(char *message, int line_number){
     exit(1);
 }
 
-/* Splits a line in place on ';'. Returns the number of fields. */
+/* Découpe une ligne sur « ; » directement dans celle-ci. Renvoie le nombre de champs. */
 int age_split_line(char *line, char *fields[NB_CSV_FIELDS]){
     int n = 1;
     int i = 0;
@@ -145,8 +145,8 @@ int age_split_line(char *line, char *fields[NB_CSV_FIELDS]){
         }
         i++;
     }
-    /* we leave the loop after the 9th field while a ';' followed it:
-       there are too many columns */
+    /* on sort de la boucle après le 9e champ lorsqu’un « ; » le suit :
+       il y a trop de colonnes */
     while (line[i] != '\0') {
         if (line[i] == ';') {
             return n + 1;
@@ -156,7 +156,7 @@ int age_split_line(char *line, char *fields[NB_CSV_FIELDS]){
     return n;
 }
 
-/* Processes one data line and updates the list. */
+/* Traite une ligne de données et met à jour la liste. */
 AgeNode *age_process_line(AgeNode *head, char *line, int line_number){
     char *fields[NB_CSV_FIELDS];
     int year = 0, birth_year = 0, user_type = 0, gender = 0;
@@ -165,7 +165,7 @@ AgeNode *age_process_line(AgeNode *head, char *line, int line_number){
         age_fatal_error("nombre de colonnes incorrect (9 attendues).", line_number);
     }
 
-    /* Column 0: year, 4: user_type, 6: gender, 7: birth_year */
+    /* Colonne 0 : année, 4 : type d’usager, 6 : genre, 7 : année de naissance */
     if (age_read_int_field(fields[0], &year) != FIELD_OK) {
         age_fatal_error("annee (year) invalide.", line_number);
     }
@@ -181,7 +181,7 @@ AgeNode *age_process_line(AgeNode *head, char *line, int line_number){
         age_fatal_error("annee de naissance (birth_year) invalide.", line_number);
     }
 
-    /* Data unusable for the chart: the line is ignored */
+    /* Données inutilisables pour le graphique : la ligne est ignorée */
     if (birth_result != FIELD_OK || user_type < 1 || user_type > NB_USER_TYPES) {
 <<<<<<< HEAD
         return head;
@@ -189,19 +189,19 @@ AgeNode *age_process_line(AgeNode *head, char *line, int line_number){
         return;
     }
     int age = year - birth_year;
-    if (age < 0 || age > AGE_MAX) { // change ça alex stp jsp pourquoi ya ca
+    if (age < 0 || age > AGE_MAX) { // commentaire d’origine : demande de clarification sur cette condition
         return;
 >>>>>>> e55cb33dac2e2ff3ce9c4f28bda94040b1e0ff76
     }
 
-    /* Impossible age: ignored. This also protects the unsigned char
-       of AgeNode (an age of 256 would silently become 0). */
+    /* Âge impossible : ignoré. Cela protège également le type unsigned char
+       de AgeNode (un âge de 256 deviendrait silencieusement égal à 0). */
     int age = year - birth_year;
     if (age < 0 || age > AGE_MAX) {
         return head;
     }
 
-    /* gender: 1 = male, 2 = female, anything else = unknown */
+    /* genre : 1 = homme, 2 = femme, toute autre valeur = inconnu */
     int gender_index = NB_GENDERS - 1;
     if (gender_result == FIELD_OK && (gender == 1 || gender == 2)) {
         gender_index = gender - 1;
@@ -218,7 +218,7 @@ AgeNode *age_process_line(AgeNode *head, char *line, int line_number){
     return head;
 }
 
-/* Loads the whole CSV file into the linked list. */
+/* Charge l’intégralité du fichier CSV dans la liste chaînée. */
 AgeNode *age_load_data(char *file){
     FILE *f = fopen(file, "r");
     if (f == NULL) {
@@ -230,7 +230,7 @@ AgeNode *age_load_data(char *file){
     int line_number = 0;
     AgeNode *head = NULL;
 
-    /* The header line is mandatory */
+    /* La ligne d’en-tête est obligatoire */
     if (fgets(line, MAX_LINE_LENGTH, f) == NULL) {
         age_fatal_error("fichier vide.", 0);
     }
@@ -252,7 +252,7 @@ AgeNode *age_load_data(char *file){
         line[length] = '\0';
 
         if (length == 0) {
-            /* empty line */
+            /* ligne vide */
         } else {
             head = age_process_line(head, line, line_number);
         }
@@ -263,11 +263,11 @@ AgeNode *age_load_data(char *file){
 }
 
 /* ------------------------------------------------------------------ */
-/*  Computations                                                      */
+/*  Calculs                                                      */
 /* ------------------------------------------------------------------ */
 
-/* Adds up the counts of one age according to the filters
-   (-1 = no filter, otherwise index of the type / of the gender). */
+/* Additionne les effectifs d’un âge en fonction des filtres
+   (-1 = aucun filtre, sinon indice du type / du genre). */
 void age_count(AgeNode *node, int type_filter, int gender_filter,
                int by_type[NB_USER_TYPES], int by_gender[NB_GENDERS]){
     for (int t = 0; t < NB_USER_TYPES; t++) {
@@ -288,9 +288,9 @@ void age_count(AgeNode *node, int type_filter, int gender_filter,
     }
 }
 
-/* Groups the ages into bins of bin_size years (bin b = ages from
-   b * bin_size to b * bin_size + bin_size - 1), applying the filters.
-   Returns the number of bins to display (last non-empty bin + 1). */
+/* Regroupe les âges dans des tranches de bin_size années (la tranche b correspond aux âges de
+   b * bin_size à b * bin_size + bin_size - 1), en appliquant les filtres.
+   Renvoie le nombre de tranches à afficher (dernière tranche non vide + 1). */
 int age_aggregate(AgeNode *head, int type_filter, int gender_filter, int bin_size,
                   int by_type[][NB_USER_TYPES], int by_gender[][NB_GENDERS]){
     int node_type[NB_USER_TYPES], node_gender[NB_GENDERS];
@@ -328,7 +328,7 @@ int age_aggregate(AgeNode *head, int type_filter, int gender_filter, int bin_siz
     return nb_bins;
 }
 
-/* Top of the y axis: a "nice" value (4 * a nice step) that is >= max_pct. */
+/* Valeur maximale de l’axe Y : une valeur arrondie (4 * un pas arrondi) supérieure ou égale à max_pct. */
 double age_axis_top(double max_pct){
     for (int i = 0; i < NB_NICE_STEPS; i++) {
         if (4 * AGE_NICE_STEPS[i] >= max_pct) {
@@ -339,10 +339,10 @@ double age_axis_top(double max_pct){
 }
 
 /* ------------------------------------------------------------------ */
-/*  Display                                                           */
+/*  Affichage                                                           */
 /* ------------------------------------------------------------------ */
 
-/* Prints n spaces with the given background color. */
+/* Affiche n espaces avec la couleur de fond indiquée. */
 void age_print_fill(char *color, int n){
     printf("%s", color);
     for (int i = 0; i < n; i++) {
@@ -351,7 +351,7 @@ void age_print_fill(char *color, int n){
     printf(ANSI_RESET);
 }
 
-/* Prints n empty characters ('.' in dim color on a grid row). */
+/* Affiche n caractères vides ( « . » en couleur atténuée sur une ligne de grille). */
 void age_print_empty(int n, int grid){
     if (grid == 1) {
         printf(ANSI_DIM);
@@ -366,7 +366,7 @@ void age_print_empty(int n, int grid){
     }
 }
 
-/* Prints the active settings. */
+/* Affiche les paramètres actifs. */
 void age_print_settings(int type_filter, int gender_filter, int bin_size){
     char *type_name = "tous";
     char *gender_name = "tous";
@@ -381,7 +381,7 @@ void age_print_settings(int type_filter, int gender_filter, int bin_size){
            type_name, gender_name, bin_size);
 }
 
-/* Prints the legend: one colored square per series. */
+/* Affiche la légende : un carré coloré par série. */
 void age_print_legend(char *colors[], char *names[], int series){
     printf("  Legende : ");
     for (int s = 0; s < series; s++) {
@@ -391,13 +391,13 @@ void age_print_legend(char *colors[], char *names[], int series){
     printf("\n");
 }
 
-/* Draws a bar chart: ages on the x axis, percentage on the y axis.
-   pct[b][s] = percentage of the selected population for bin b, series s.
-   stacked = 1 : the series are stacked in one column (types of users)
-   stacked = 0 : the series are side by side (genders). */
+/* Dessine un diagramme en barres : les âges sur l’axe X et les pourcentages sur l’axe Y.
+   pct[b][s] = pourcentage de la population sélectionnée pour la tranche b et la série s.
+   stacked = 1 : les séries sont empilées dans une seule colonne (types d’usagers)
+   stacked = 0 : les séries sont côte à côte (genres). */
 void age_draw_chart(double pct[][NB_USER_TYPES], int nb_bins, int bin_size,
                     int series, int stacked, char *colors[]){
-    int cols = 1;   /* number of columns per bin */
+    int cols = 1;   /* nombre de colonnes par tranche */
     int height[MAX_BINS][NB_USER_TYPES];
     double max = 0;
 
@@ -405,7 +405,7 @@ void age_draw_chart(double pct[][NB_USER_TYPES], int nb_bins, int bin_size,
         cols = series;
     }
 
-    /* y scale */
+    /* Échelle de l’axe Y */
     for (int b = 0; b < nb_bins; b++) {
         double value = 0;
         for (int s = 0; s < series; s++) {
@@ -420,9 +420,9 @@ void age_draw_chart(double pct[][NB_USER_TYPES], int nb_bins, int bin_size,
         }
     }
     double top  = age_axis_top(max);
-    double step = top / CHART_HEIGHT;   /* percentage represented by one row */
+    double step = top / CHART_HEIGHT;   /* pourcentage représenté par une ligne */
 
-    /* height (in rows) of every bar; stacked bars store cumulated heights */
+    /* hauteur (en lignes) de chaque barre ; les barres empilées stockent les hauteurs cumulées */
     for (int b = 0; b < nb_bins; b++) {
         double cumulated = 0;
         int first = -1;
@@ -437,7 +437,7 @@ void age_draw_chart(double pct[][NB_USER_TYPES], int nb_bins, int bin_size,
                 first = s;
             }
         }
-        /* a non-empty bar is always at least one row high */
+        /* une barre non vide mesure toujours au moins une ligne de haut */
         if (stacked == 1) {
             if (first >= 0 && height[b][series - 1] == 0) {
                 for (int s = first; s < series; s++) {
@@ -453,7 +453,7 @@ void age_draw_chart(double pct[][NB_USER_TYPES], int nb_bins, int bin_size,
         }
     }
 
-    /* width of a bin: bars thickness (th) and gap between bins */
+    /* largeur d’une tranche : épaisseur des barres (th) et espace entre les tranches */
     int room = CHART_MAX_WIDTH / nb_bins;
     int gap  = 0;
     if (room >= cols + 1) {
@@ -468,7 +468,7 @@ void age_draw_chart(double pct[][NB_USER_TYPES], int nb_bins, int bin_size,
     }
     int cell = cols * th + gap;
 
-    /* plot area, from the top row to the bottom row */
+    /* zone du graphique, de la ligne du haut à celle du bas */
     for (int r = CHART_HEIGHT; r >= 1; r--) {
         int grid = 0;
         if (r % LABEL_ROWS == 0) {
@@ -500,15 +500,15 @@ void age_draw_chart(double pct[][NB_USER_TYPES], int nb_bins, int bin_size,
         printf("\n");
     }
 
-    /* x axis */
+    /* axe X */
     printf("    0.00%% +");
     for (int i = 0; i < nb_bins * cell; i++) {
         printf("-");
     }
     printf("\n");
 
-    /* x labels: start age of the bin, every k bins (multiple of 10 years,
-       and wide enough to avoid overlapping) */
+    /* étiquettes de l’axe X : âge de début de tranche, toutes les k tranches (multiples de 10 ans,
+       et espacées suffisamment pour éviter les chevauchements) */
     int k = (4 + cell - 1) / cell;
     while ((k * bin_size) % 10 != 0) {
         k++;
@@ -537,13 +537,13 @@ void age_draw_chart(double pct[][NB_USER_TYPES], int nb_bins, int bin_size,
     printf(ANSI_BOLD "Age (ans)" ANSI_RESET "\n");
 }
 
-/* Prints "20-24 ans" for bin b. */
+/* Affiche « 20-24 ans » pour la tranche b. */
 void age_print_bin_range(int b, int bin_size){
     printf("%d-%d ans", b * bin_size, b * bin_size + bin_size - 1);
 }
 
-/* Chart by type of user: stacked bars (driver / passenger / pedestrian).
-   Percentage = share of the age bin in the selected population. */
+/* Graphique par type d’usager : barres empilées (conducteur / passager / piéton).
+   Pourcentage = part de la tranche d’âge dans la population sélectionnée. */
 void age_print_type_chart(AgeNode *head, int type_filter, int gender_filter, int bin_size){
     int by_type[MAX_BINS][NB_USER_TYPES], by_gender[MAX_BINS][NB_GENDERS];
     double pct[MAX_BINS][NB_USER_TYPES];
@@ -587,8 +587,8 @@ void age_print_type_chart(AgeNode *head, int type_filter, int gender_filter, int
     printf(" (%.2f%%)\n", peak_pct);
 }
 
-/* Chart by gender: men and women side by side for each age bin.
-   People whose gender is unknown are excluded from the computation. */
+/* Graphique par genre : hommes et femmes côte à côte pour chaque tranche d’âge.
+   Les personnes dont le genre est inconnu sont exclues du calcul. */
 void age_print_gender_chart(AgeNode *head, int type_filter, int gender_filter, int bin_size){
     int by_type[MAX_BINS][NB_USER_TYPES], by_gender[MAX_BINS][NB_GENDERS];
     double pct[MAX_BINS][NB_USER_TYPES];
@@ -596,7 +596,7 @@ void age_print_gender_chart(AgeNode *head, int type_filter, int gender_filter, i
 
     int nb_bins = age_aggregate(head, type_filter, gender_filter, bin_size, by_type, by_gender);
     while (nb_bins > 0 && by_gender[nb_bins - 1][0] + by_gender[nb_bins - 1][1] == 0) {
-        nb_bins--;   /* last bins only contain unknown genders */
+        nb_bins--;   /* les dernières tranches ne contiennent que des genres inconnus */
     }
     for (int b = 0; b < nb_bins; b++) {
         total   = total + by_gender[b][0] + by_gender[b][1];
@@ -642,20 +642,20 @@ void age_print_gender_chart(AgeNode *head, int type_filter, int gender_filter, i
 /*  Menu                                                              */
 /* ------------------------------------------------------------------ */
 
-/* Reads a line from the keyboard. Returns 0 at end of input (EOF). */
+/* Lit une ligne au clavier. Renvoie 0 lorsque l’entrée est terminée (EOF). */
 int age_read_input(char *buffer){
     if (scanf("%15s", buffer) != 1) {
         return 0;
     }
     int c = getchar();
     while (c != '\n' && c != EOF) {
-        /* we discard the rest of the line */
+        /* on ignore le reste de la ligne */
         c = getchar();
     }
     return 1;
 }
 
-/* Prints the main menu. */
+/* Affiche le menu principal. */
 void age_print_menu(int type_filter, int gender_filter, int bin_size){
     printf(ANSI_BOLD ANSI_BRIGHT_RED);
     printf("\n  +===========================================+\n");
@@ -674,10 +674,10 @@ void age_print_menu(int type_filter, int gender_filter, int bin_size){
     fflush(stdout);
 }
 
-/* Asks the user to choose among nb options.
-   allow_none = 1 : option 0 means "no filter" and the function returns -1.
-   Otherwise the options are 1..nb. Returns the index of the chosen option,
-   or current if the input is invalid. */
+/* Demande à l’utilisateur de choisir parmi nb options.
+   allow_none = 1 : l’option 0 signifie « aucun filtre » et la fonction renvoie -1.
+   Sinon, les options vont de 1 à nb. Renvoie l’indice de l’option choisie,
+   ou current si la saisie est invalide. */
 int age_ask_choice(char *title, char *names[], int nb, int current, int allow_none){
     char input[INPUT_LEN];
     int choice = 0;
@@ -704,7 +704,7 @@ int age_ask_choice(char *title, char *names[], int nb, int current, int allow_no
     return choice - 1;
 }
 
-/* AGE_DATA mode entry point. */
+/* Point d’entrée du mode AGE_DATA. */
 void age_data(char *file){
     AgeNode *head = age_load_data(file);
     int type_filter = -1, gender_filter = -1;
@@ -726,7 +726,7 @@ void age_data(char *file){
             type_filter = age_ask_choice("Filtre sur le type d'usager :",
                                          AGE_TYPE_NAMES, NB_USER_TYPES, type_filter, 1);
         } else if (strcmp(input, "4") == 0) {
-            /* the 3rd gender (unknown) is not offered as a filter */
+            /* le 3e genre (inconnu) n’est pas proposé comme filtre */
             gender_filter = age_ask_choice("Filtre sur le genre :",
                                            AGE_GENDER_NAMES, NB_GENDERS - 1, gender_filter, 1);
         } else if (strcmp(input, "5") == 0) {
