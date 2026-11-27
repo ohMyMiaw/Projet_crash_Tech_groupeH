@@ -1,21 +1,19 @@
 #ifndef age_data_h
 #define age_data_h
 
-#define AGE_INCONNU (-1)
+/*indices des tableaux de comptage */
+#define NB_USER_TYPES 3 /* 0=conducteur, 1=passager, 2=piéton */
+#define NB_GENDERS 3 /* 0=homme, 1=femme, 2=non relevé */
 
 void age_data(char *fichier);
 
-//PYRAMIDE DES GENRES AVEC FILTRES PAR GENRE ET TYPES (CONDUCTEURS PIETONS..)
+//Pyramide des ages avec filtres par genre et types d'usager
+//un maillon par age, la liste ets triée par age décroissant
+//count[NB_USER_TYPES][NB_GENDERS] permet de croiser les filtre 
+
 typedef struct AgeNode {
-    int age;
-
-    int driver_count;
-    int passenger_count;
-    int pedestrian_count;
-
-    int male_count;
-    int female_count;
-    int unknown_gender_count;
+    unsigned char age;
+    unsigned int count[NB_USER_TYPES][NB_GENDERS];
 
     struct AgeNode *next;
 } AgeNode;
