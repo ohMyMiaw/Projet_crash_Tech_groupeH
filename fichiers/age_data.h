@@ -1,6 +1,6 @@
 #ifndef age_data_h
 #define age_data_h
-#define AGE_MAX 130
+#define AGE_MAX 120
 
 /*indices des tableaux de comptage */
 #define NB_USER_TYPES 3 /* 0=conducteur, 1=passager, 2=piéton */
