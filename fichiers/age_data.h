@@ -6,7 +6,7 @@
 #define NB_USER_TYPES 3 /* 0=conducteur, 1=passager, 2=piéton */
 #define NB_GENDERS 3 /* 0=homme, 1=femme, 2=non relevé */
 
-void age_data(char *fichier);
+void age_data(char *file);
 
 //Pyramide des ages avec filtres par genre et types d'usager
 //un maillon par age, la liste ets triée par age décroissant
@@ -14,7 +14,7 @@ void age_data(char *fichier);
 
 typedef struct AgeNode {
     unsigned char age;
-    unsigned int count[NB_USER_TYPES][NB_GENDERS];
+    int count[NB_USER_TYPES][NB_GENDERS];
 
     struct AgeNode *next;
 } AgeNode;
